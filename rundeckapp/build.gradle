@@ -375,7 +375,7 @@ task('copyPluginLibs').dependsOn(configurations.pluginFiles).doLast {
             fileProps['plugin.author'] = pluginProps['Rundeck-Plugin-Author'] ?: 'Rundeck, Inc.'
             fileProps['plugin.version'] = pluginProps['Rundeck-Plugin-File-Version'] ?: version
             fileProps['plugin.url'] = pluginProps['Rundeck-Plugin-URL'] ?: 'http://rundeck.com'
-            fileProps['plugin.date'] = pluginProps['Rundeck-Plugin-BuildDate'] ?: (new Date().toString())
+            // fileProps['plugin.date'] = pluginProps['Rundeck-Plugin-BuildDate'] ?: (new Date().toString())
             fileProps['plugin.filename'] = f
 
             //write properties file
