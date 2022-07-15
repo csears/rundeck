@@ -379,15 +379,21 @@ task('copyPluginLibs').dependsOn(configurations.pluginFiles).doLast {
             fileProps['plugin.filename'] = f
 
             //write properties file
-            new File(libextDir, pluginFile.name + '.properties').withOutputStream {
-                fileProps.store(it, "generated manifest")
+            new File(libextDir, pluginFile.name + '.properties').withWriter { writer ->
+                //fileProps.store(it, "generated manifest")
+                fileProps.each { k, v ->
+                    writer.write("${k}=${v}${System.lineSeparator()}")
+                }
             }
         }
     }
     Properties manifestProps = new Properties()
     manifestProps['pluginFileList'] = (filelist.join(','))
     manifestFile.withWriter { w ->
-        manifestProps.store(w,"generated manifest")
+        //manifestProps.store(w,"generated manifest")
+        manifestProps.each { k, v ->
+            w.write("${k}=${v}${System.lineSeparator()}")
+        }
     }
 }
 
