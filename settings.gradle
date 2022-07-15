@@ -14,10 +14,38 @@
  * limitations under the License.
  */
 
- plugins {
-    id "com.gradle.enterprise" version "3.7.1"
+plugins {
+    id "com.gradle.enterprise" version "3.10.3"
+    id 'com.gradle.common-custom-user-data-gradle-plugin' version '1.7.2'
 }
 
+rootProject.name = 'rundeck'
+
+gradleEnterprise {
+    server = "https://ge.sears.io"
+    buildScan {
+        publishAlways()
+        capture {
+            taskInputFiles = true
+        }
+        uploadInBackground = false
+    }
+}
+
+buildCache {
+  local {
+    enabled = false
+  }
+//   remote(HttpBuildCache) {
+//     push = true
+//     // Your personal Gradle Enterprise instance's Build Cache access point
+//     url = 'https://ge.sears.io/cache/'
+//     credentials {
+//         username = 'cache-user'
+//         password = 'xxxxxxxxxx'
+//     }
+//   }
+}
 include	'rundeck-storage',
     'rundeck-storage:rundeck-storage-api',
     'rundeck-storage:rundeck-storage-data',
