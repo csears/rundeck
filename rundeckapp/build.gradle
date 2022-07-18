@@ -342,57 +342,67 @@ buildProperties.doLast {
     }
 }
 
-task('copyPluginLibs').dependsOn(configurations.pluginFiles).doLast {
-    println "copying plugin libs"
+task('copyPluginLibs') {
+
+    it.dependsOn(configurations.pluginFiles)
+
     File libextDir = new File(buildDir, "WEB-INF/rundeck/plugins")
     File manifestFile = new File(buildDir, "WEB-INF/rundeck/plugins/manifest.properties")
 
-    def filelist=[]
-    libextDir.mkdirs()
-    configurations.pluginFiles.files.each { pluginFile ->
-        project.logger.info("Bundling libExt plugin ${pluginFile.name}")
+    it.outputs.file(manifestFile)
+    it.outputs.dir(libextDir)
+
+    doLast {
+        println "copying plugin libs"
+
+        def filelist=[]
+        libextDir.mkdirs()
+        configurations.pluginFiles.files.each { pluginFile ->
+            project.logger.info("Bundling libExt plugin ${pluginFile.name}")
 
 
-        copy {
-            from pluginFile
-            into libextDir
-        }
-        filelist << pluginFile.name
+            copy {
+                from pluginFile
+                into libextDir
+            }
+            filelist << pluginFile.name
 
-        /** Mangle JAR plugin properties **/
-        if ( ['.jar','.zip'].contains(pluginFile.name[-4..-1]) ) {
-            def pluginProps = [:]
-            pluginFile.withInputStream {
-                def jarmf = new JarInputStream(it).manifest
-                jarmf.getMainAttributes().findAll { it.key.toString().startsWith('Rundeck-Plugin') }.each { k, v ->
-                    pluginProps[k.toString()] = v
+            /** Mangle JAR plugin properties **/
+            if ( ['.jar','.zip'].contains(pluginFile.name[-4..-1]) ) {
+                def pluginProps = [:]
+                pluginFile.withInputStream {
+                    def jarmf = new JarInputStream(it).manifest
+                    jarmf.getMainAttributes().findAll { it.key.toString().startsWith('Rundeck-Plugin') }.each { k, v ->
+                        pluginProps[k.toString()] = v
+                    }
+                }
+                def f = pluginFile.name
+                Properties fileProps = new Properties()
+                fileProps['plugin.name'] = pluginProps['Rundeck-Plugin-Name'] ?: f
+                fileProps['plugin.description'] = pluginProps['Rundeck-Plugin-Description'] ?: 'Rundeck bundled plugin'
+                fileProps['plugin.author'] = pluginProps['Rundeck-Plugin-Author'] ?: 'Rundeck, Inc.'
+                fileProps['plugin.version'] = pluginProps['Rundeck-Plugin-File-Version'] ?: version
+                fileProps['plugin.url'] = pluginProps['Rundeck-Plugin-URL'] ?: 'http://rundeck.com'
+                // fileProps['plugin.date'] = pluginProps['Rundeck-Plugin-BuildDate'] ?: (new Date().toString())
+                fileProps['plugin.filename'] = f
+
+                //write properties file
+                new File(libextDir, pluginFile.name + '.properties').withWriter { writer ->
+                    //fileProps.store(it, "generated manifest")
+                    fileProps.each { k, v ->
+                        writer.write("${k}=${v}${System.lineSeparator()}")
+                    }
                 }
             }
-            def f = pluginFile.name
-            Properties fileProps = new Properties()
-            fileProps['plugin.name'] = pluginProps['Rundeck-Plugin-Name'] ?: f
-            fileProps['plugin.description'] = pluginProps['Rundeck-Plugin-Description'] ?: 'Rundeck bundled plugin'
-            fileProps['plugin.author'] = pluginProps['Rundeck-Plugin-Author'] ?: 'Rundeck, Inc.'
-            fileProps['plugin.version'] = pluginProps['Rundeck-Plugin-File-Version'] ?: version
-            fileProps['plugin.url'] = pluginProps['Rundeck-Plugin-URL'] ?: 'http://rundeck.com'
-            // fileProps['plugin.date'] = pluginProps['Rundeck-Plugin-BuildDate'] ?: (new Date().toString())
-            fileProps['plugin.filename'] = f
-
-            //write properties file
-            new File(libextDir, pluginFile.name + '.properties').withWriter { writer ->
-                //fileProps.store(it, "generated manifest")
-                fileProps.each { k, v ->
-                    writer.write("${k}=${v}${System.lineSeparator()}")
-                }
-            }
         }
-    }
-    Properties manifestProps = new Properties()
-    manifestProps['pluginFileList'] = (filelist.join(','))
-    manifestFile.withWriter { w ->
-        //manifestProps.store(w,"generated manifest")
-        manifestProps.each { k, v ->
-            w.write("${k}=${v}${System.lineSeparator()}")
+    
+        Properties manifestProps = new Properties()
+        manifestProps['pluginFileList'] = (filelist.join(','))
+        manifestFile.withWriter { w ->
+            //manifestProps.store(w,"generated manifest")
+            manifestProps.each { k, v ->
+                w.write("${k}=${v}${System.lineSeparator()}")
+            }
         }
     }
 }
