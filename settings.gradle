@@ -33,9 +33,10 @@ gradleEnterprise {
 
 buildCache {
   local {
-    enabled = false
+    enabled = true
   }
-//   remote(HttpBuildCache) {
+   remote(HttpBuildCache) {
+       enabled = false
 //     push = true
 //     // Your personal Gradle Enterprise instance's Build Cache access point
 //     url = 'https://ge.sears.io/cache/'
@@ -43,7 +44,7 @@ buildCache {
 //         username = 'cache-user'
 //         password = 'xxxxxxxxxx'
 //     }
-//   }
+   }
 }
 include	'rundeck-storage',
     'rundeck-storage:rundeck-storage-api',
