@@ -55,6 +55,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 // add all of the artifacts above to our archives list
 artifacts {
     archives testJar
-    archives sourcesJar
+    // archives sourcesJar
     archives javadocJar
 }
