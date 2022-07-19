@@ -349,8 +349,11 @@ task('copyPluginLibs') {
     File libextDir = new File(buildDir, "WEB-INF/rundeck/plugins")
     File manifestFile = new File(buildDir, "WEB-INF/rundeck/plugins/manifest.properties")
 
-    it.outputs.file(manifestFile)
-    it.outputs.dir(libextDir)
+    outputs.file(manifestFile)
+    outputs.dir(libextDir)
+    inputs.property("version", version)
+    inputs.files(configurations.pluginFiles)
+        .withPropertyName('pluginFiles')
 
     doLast {
         println "copying plugin libs"

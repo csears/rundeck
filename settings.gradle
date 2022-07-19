@@ -28,7 +28,6 @@ gradleEnterprise {
         capture {
             taskInputFiles = true
         }
-        uploadInBackground = false
     }
 }
 
