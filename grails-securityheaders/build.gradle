@@ -81,7 +81,6 @@ task removePropTimestamp {
     dependsOn "compileGroovyPages"
     inputs.file("$buildDir/gsp-classes/main/gsp/views.properties")
     outputs.file("$buildDir/gsp-classes/main/gsp/views.properties")
-    outputs.cacheIf(true)
     doLast {
         String fileContents = ""
         File file = new File("$buildDir/gsp-classes/main/gsp/views.properties")
