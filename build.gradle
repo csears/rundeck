@@ -97,7 +97,7 @@ file("version.properties").withInputStream { versionProps.load(it) }
 def vVersion = versionProps.getProperty('version.version')
 def vNum = ext.vNum = versionProps.getProperty('version.number')
 def vTag = ext.vTag = project.environment == 'release'? versionProps.getProperty('version.tag') : 'SNAPSHOT'
-def vDate = ext.vDate = versionProps.getProperty('version.date')
+//def vDate = ext.vDate = versionProps.getProperty('version.date')
 def vRevision = ext.vRevision = versionProps.getProperty('version.release.number')
 
 if (ext.environment == 'release') {
@@ -201,7 +201,6 @@ task bashVersionInfo {
         |VERSION_FULL=${project.resolvedVersion}
         |VERSION_NUMBER=${project.vNum}
         |VERSION_TAG=${project.vTag}
-        |VERSION_DATE=${project.vDate}
         |VERSION_REVISION=${project.vRevision}""".stripMargin()
     }
 }

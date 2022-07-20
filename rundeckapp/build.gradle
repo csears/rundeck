@@ -337,8 +337,11 @@ buildProperties.doLast {
         properties.setProperty("build.core.git.branch", project.gitBranch)
     }
 
-    grailsBuildInfoFile.withOutputStream {
-        properties.store(it,null)
+    grailsBuildInfoFile.withWriter { writer ->
+        // properties.store(it,null)
+        properties.each { k, v ->
+            writer.write("${k}=${v}${System.lineSeparator()}")
+        }
     }
 }
 

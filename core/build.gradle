@@ -165,7 +165,7 @@ task expandTemplate {
         def datestring = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").format(new Date())
         println("Building: $version-$buildNum ($datestring)")
         copy {
-            expand('version': version, 'version_build': buildNum, 'version_ident': version + '-' + buildNum, date: datestring)
+            expand('version': version, 'version_build': buildNum, 'version_ident': version + '-' + buildNum)
             from "$projectDir/src/main/meta/com/dtolabs/rundeck/core/application.properties"
             into "$projectDir/src/main/resources/META-INF/com/dtolabs/rundeck/core/"
         }
