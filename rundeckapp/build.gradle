@@ -297,24 +297,30 @@ class SpecDirProvider implements CommandLineArgumentProvider {
     @PathSensitive(PathSensitivity.RELATIVE)                                
     File specDir
 
-    String getPath() {
-        specDir.absolutePath.toString() 
-    }
-
     @Override
     Iterable<String> asArguments() {
         ["-Dmicronaut.openapi.additional.files=${specDir.absolutePath}".toString()] 
     }
 }
 
-tasks.withType(GroovyCompile) {
+task makeSpecDir {
     def additionalSpecDir = new File(project.buildDir, 'openapi')
-    doFirst {
+    outputs.dir(additionalSpecDir)
+    doLast {
         additionalSpecDir.mkdirs()
     }
+}
+
+tasks.withType(GroovyCompile) {
+    dependsOn "makeSpecDir"
+
+    def additionalSpecDir = new File(project.buildDir, 'openapi')
+    // doFirst {
+    //     additionalSpecDir.mkdirs()
+    // }
     configure(groovyOptions) {
         forkOptions.jvmArgs = ['-Xmx1024m']
-        jvmArgumentProviders.add(new SpecDirProvider(specDir: additionalSpecDir))
+        forkOptions.jvmArgumentProviders.add(new SpecDirProvider(specDir: additionalSpecDir))
     }
 }
 

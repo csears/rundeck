@@ -76,6 +76,7 @@ tasks.withType(GroovyCompile) {
 }
 
 tasks.named("compileGroovyPages") {
+    outputs.cacheIf { true }
     doLast {
         String fileContents = ""
         File file = new File("$buildDir/gsp-classes/main/gsp/views.properties")
