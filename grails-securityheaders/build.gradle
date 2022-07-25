@@ -70,17 +70,12 @@ bootRun {
 }
 
 tasks.withType(GroovyCompile) {
-    outputs.file("$buildDir/gsp-classes/main/gsp/views.properties")
     configure(groovyOptions) {
         forkOptions.jvmArgs = ['-Xmx1024m']
     }
-    finalizedBy "removePropTimestamp"
 }
 
-task removePropTimestamp {
-    dependsOn "compileGroovyPages"
-    inputs.file("$buildDir/gsp-classes/main/gsp/views.properties")
-    outputs.file("$buildDir/gsp-classes/main/gsp/views.properties")
+tasks.named("compileGroovyPages") {
     doLast {
         String fileContents = ""
         File file = new File("$buildDir/gsp-classes/main/gsp/views.properties")

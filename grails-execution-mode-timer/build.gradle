@@ -92,6 +92,20 @@ bootRun {
     String springProfilesActive = 'spring.profiles.active'
     systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
+
+tasks.named("compileGroovyPages") {
+    doLast {
+        String fileContents = ""
+        File file = new File("$buildDir/gsp-classes/main/gsp/views.properties")
+        file.eachLine { line ->
+            if (!line.startsWith("#")) {
+                fileContents += line + System.lineSeparator()
+            }
+        }
+        file.text = fileContents
+    }
+}
+
 // enable if you wish to package this plugin as a standalone application
 bootJar.enabled = false
 

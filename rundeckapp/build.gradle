@@ -292,13 +292,25 @@ bootRun {
     systemProperty "rundeck.server.logDir", System.getProperty("logRoot")+"/server/logs"
 }
 
+class SpecDirProvider { 
+    @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)                                
+    File specDir
+
+    String getPath() {
+        specDir.absolutePath.toString() 
+    }
+}
+
 tasks.withType(GroovyCompile) {
     def additionalSpecDir = new File(project.buildDir, 'openapi')
     doFirst {
         additionalSpecDir.mkdirs()
     }
     configure(groovyOptions) {
-        forkOptions.jvmArgs = ['-Xmx1024m',"-Dmicronaut.openapi.additional.files=${additionalSpecDir.absolutePath}".toString()]
+        SpecDirProvider sdp = new SpecDirProvider()
+        sdp.specDir = additionalSpecDir
+        forkOptions.jvmArgs = ['-Xmx1024m',"-Dmicronaut.openapi.additional.files=${sdp.getPath()}".toString()]
     }
 }
 
@@ -564,3 +576,15 @@ if (project.hasProperty('signing.keyId') && project.hasProperty('signing.passwor
     }
 }
 
+tasks.named("compileGroovyPages") {
+    doLast {
+        String fileContents = ""
+        File file = new File("$buildDir/gsp-classes/main/gsp/views.properties")
+        file.eachLine { line ->
+            if (!line.startsWith("#")) {
+                fileContents += line + System.lineSeparator()
+            }
+        }
+        file.text = fileContents
+    }
+}
