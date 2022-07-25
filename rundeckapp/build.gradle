@@ -292,13 +292,18 @@ bootRun {
     systemProperty "rundeck.server.logDir", System.getProperty("logRoot")+"/server/logs"
 }
 
-class SpecDirProvider { 
+class SpecDirProvider implements CommandLineArgumentProvider { 
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)                                
     File specDir
 
     String getPath() {
         specDir.absolutePath.toString() 
+    }
+
+    @Override
+    Iterable<String> asArguments() {
+        ["-Dmicronaut.openapi.additional.files=${specDir.absolutePath}".toString()] 
     }
 }
 
@@ -308,9 +313,8 @@ tasks.withType(GroovyCompile) {
         additionalSpecDir.mkdirs()
     }
     configure(groovyOptions) {
-        SpecDirProvider sdp = new SpecDirProvider()
-        sdp.specDir = additionalSpecDir
-        forkOptions.jvmArgs = ['-Xmx1024m',"-Dmicronaut.openapi.additional.files=${sdp.getPath()}".toString()]
+        forkOptions.jvmArgs = ['-Xmx1024m']
+        jvmArgumentProviders.add(new SpecDirProvider(specDir: additionalSpecDir))
     }
 }
 
